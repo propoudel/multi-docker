@@ -1,0 +1,22 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t propoudel/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run -e CI=true propoudel/react-test npm test
+
+after_success:
+  - docker build -t propoudel/multi-client ./client
+  - docker build -t propoudel/multi-nginx ./nginx
+  - docker build -t propoudel/multi-server ./server
+  - docker build -t propoudel/multi-worker ./worker
+  #Log in to the docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  #Take those images and push them to docker hub
+  - docker push propoudel/multi-client
+  - docker push propoudel/multi-nginx
+  - docker push propoudel/multi-server
+  - docker push propoudel/multi-worker
