@@ -7,6 +7,7 @@ before_install:
 
 script:
   - docker run -e CI=true propoudel/react-test npm test
+
 after_success:
   - docker build -t propoudel/multi-client ./client
   - docker build -t propoudel/multi-nginx ./nginx
